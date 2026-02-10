@@ -7,6 +7,35 @@ import { redirect } from "next/navigation"
 import prisma from "@/lib/db"
 import { Octokit } from "octokit"
 
+
+export async function getContributionStats() {
+    try {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        })
+        if (!session?.user) {
+            throw new Error("Unauthorized")
+        }
+        const accessToken = await getGithubAccessToken()
+        const octokit = new Octokit({ auth: accessToken })
+        const { data: user } = await octokit.rest.users.getAuthenticated()
+        const calendar = await fetchUserContributions(accessToken, user.login)
+
+        if (!calendar) return null;
+        const contributions = calendar.weeks.flatMap((week: any) => week.contributionDays.map((day: any) => ({
+            date: day.date,
+            count: day.contributionCount,
+            level: Math.min(4, Math.floor(day.contributionCount / 3)),
+        })))
+        return {
+            contributions,
+            totalContributions: calendar.totalContributions
+        }
+    } catch (error) {
+        console.error("Failed to fetch contribution stats", error)
+        return null
+    }
+}
 export async function getDashboardStats() {
     try {
         const session = await auth.api.getSession({

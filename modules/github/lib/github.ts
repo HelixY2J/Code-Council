@@ -67,6 +67,6 @@ export async function fetchUserContributions(token: string, username: string) {
         return response.user.contributionsCollection.contributionCalendar
     } catch (error) {
         console.error("Failed to fetch user contributions", error)
-        throw error
+        return null;
     }
 }
