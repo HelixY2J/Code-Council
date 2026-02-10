@@ -19,6 +19,9 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -49,13 +52,16 @@ export const AppSidebar = () => {
 
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: GithubLogoIcon },
-        { href: "/repositories", label: "Repositories", icon: BookIcon },
+        { href: "/dashboard/repository", label: "Repositories", icon: BookIcon },
         { href: "/reviews", label: "Reviews", icon: TreeViewIcon },
         { href: "/subscriptions", label: "Subscriptions", icon: CoinsIcon },
         { href: "/settings", label: "Settings", icon: GearSixIcon },
     ]
 
     const isActive = (url: string) => {
+        if (url === "/dashboard") {
+            return pathname === url
+        }
         return pathname === url || pathname.startsWith(url + "/")
     }
 
@@ -86,22 +92,27 @@ export const AppSidebar = () => {
             </SidebarHeader>
             <SidebarSeparator />
             <SidebarContent>
-                <SidebarMenu>
-                    {navItems.map((item) => (
-                        <SidebarMenuItem key={item.href}>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={isActive(item.href)}
-                                tooltip={item.label}
-                            >
-                                <Link href={item.href}>
-                                    <item.icon className="h-4 w-4" />
-                                    <span>{item.label}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Menu</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu className="gap-2">
+                            {navItems.map((item) => (
+                                <SidebarMenuItem key={item.href}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={isActive(item.href)}
+                                        tooltip={item.label}
+                                    >
+                                        <Link href={item.href}>
+                                            <item.icon className="h-4 w-4" />
+                                            <span>{item.label}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>
