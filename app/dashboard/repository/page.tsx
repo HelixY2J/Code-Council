@@ -1,9 +1,11 @@
 "use client"
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useRepositories } from "@/modules/repository/hooks/use-repositories";
+import { useConnectRepository } from "@/modules/repository/hooks/use-connect-repository";
 import { MagnifyingGlassIcon, ArrowSquareOutIcon, StarIcon, GitForkIcon } from "@phosphor-icons/react/dist/ssr";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { RepositoryListSkeleton } from "@/modules/repository/components/repository-skeleton";
@@ -30,6 +32,7 @@ interface Repository {
 
 export default function RepositoryPage() {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useRepositories()
+    const { mutateAsync: connectRepo } = useConnectRepository()
     const [searchQuery, setSearchQuery] = useState("")
     const [isConnecting, setIsConnecting] = useState<Record<number, boolean>>({})
 
@@ -68,11 +71,19 @@ export default function RepositoryPage() {
         )
     }, [allRepos, searchQuery])
 
-    const handleConnect = async (repoId: number) => {
-        setIsConnecting(prev => ({ ...prev, [repoId]: true }))
-        // Placeholder for future implementation
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsConnecting(prev => ({ ...prev, [repoId]: false }))
+    const handleConnect = async (repo: Repository) => {
+        setIsConnecting(prev => ({ ...prev, [repo.id]: true }))
+        try {
+            await connectRepo({
+                owner: repo.owner.login,
+                repo: repo.name,
+                githubId: repo.id
+            })
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsConnecting(prev => ({ ...prev, [repo.id]: false }))
+        }
     }
 
     return (
@@ -151,7 +162,7 @@ export default function RepositoryPage() {
                                         size="sm"
                                         className={cn("h-8 text-xs", repo.isConnected && "opacity-50 cursor-not-allowed")}
                                         disabled={repo.isConnected || isConnecting[repo.id]}
-                                        onClick={() => handleConnect(repo.id)}
+                                        onClick={() => handleConnect(repo)}
                                     >
                                         {isConnecting[repo.id] ? "Connecting..." : repo.isConnected ? "Connected" : "Connect"}
                                     </Button>
