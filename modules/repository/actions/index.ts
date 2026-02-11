@@ -5,6 +5,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { Octokit } from "octokit"
 import { getGithubAccessToken, getRepositories as getGithubRepositories, createWebhook } from "@/modules/github/lib/github"
+import { inngest } from "@/inngest/client"
 
 export async function getRepositories(page: number = 1, perPage: number = 10) { // pagenumber
     try {
@@ -63,7 +64,20 @@ export const connectRepository = async (owner: string, repo: string, githubId: n
 
         // TODO INCREMENET REPO COUNT FOR USAGE TRACKING
 
-        // TODO TRIGGER REPO INDEXING FOR RAG 
+        //  TRIGGER REPO INDEXING FOR RAG 
+
+        try {
+            await inngest.send({
+                name: "repository.connected",
+                data: {
+                    owner,
+                    repo,
+                    userId: session.user.id
+                }
+            })
+        } catch (error) {
+            console.error("Failed to trigger repository indexing", error)
+        }
 
         return webhook
 
