@@ -53,9 +53,9 @@ export const AppSidebar = () => {
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: GithubLogoIcon },
         { href: "/dashboard/repository", label: "Repositories", icon: BookIcon },
-        { href: "/reviews", label: "Reviews", icon: TreeViewIcon },
-        { href: "/subscriptions", label: "Subscriptions", icon: CoinsIcon },
-        { href: "/settings", label: "Settings", icon: GearSixIcon },
+        { href: "/dashboard/reviews", label: "Reviews", icon: TreeViewIcon },
+        { href: "/dashboard/subscriptions", label: "Subscriptions", icon: CoinsIcon },
+        { href: "/dashboard/settings", label: "Settings", icon: GearSixIcon },
     ]
 
     const isActive = (url: string) => {
