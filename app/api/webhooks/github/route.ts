@@ -1,3 +1,4 @@
+import { reviewPullRequest } from "@/modules/ai/action";
 import { NextRequest, NextResponse } from "next/server"
 
 
@@ -8,6 +9,16 @@ export async function POST(req: NextRequest) {
         console.log(`got github event:, ${event}`)
         if (event == "ping") return NextResponse.json({ message: "PONG" }, { status: 200 })
 
+        if (event == "pull_request") {
+            const action = body.action;
+            const repo = body.repository.full_name;
+            const prNumber = body.Number;
+
+            const [owner, repoName] = repo.split("/");
+            reviewPullRequest(owner, repoName, prNumber)
+                .then(() => console.log(`PR review completed for ${repo} #${prNumber}`))
+                .catch((error) => console.error(`Review failed for ${repo} #${prNumber}`, error))
+        }
         return NextResponse.json({ message: "Event processed" }, { status: 200 })
     } catch (error) {
         console.error("Failed to process webhook", error)
