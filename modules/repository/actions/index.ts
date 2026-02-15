@@ -2,8 +2,7 @@
 import prisma from "@/lib/db"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-import { redirect } from "next/navigation"
-import { Octokit } from "octokit"
+import { canConnectRepository, incrementRepositoryCount, decrementRepositoryCount } from "@/modules/payment/lib/subscription"
 import { getGithubAccessToken, getRepositories as getGithubRepositories, createWebhook } from "@/modules/github/lib/github"
 import { inngest } from "@/inngest/client"
 
@@ -44,7 +43,11 @@ export const connectRepository = async (owner: string, repo: string, githubId: n
         }
 
 
-        // TDODO CHECK IF USER CAN CONNECT TO MORE REPO RO NOT
+        // DONE CHECK IF USER CAN CONNECT TO MORE REPO RO NOT
+        const canConnect = await canConnectRepository(session.user.id);
+        if (!canConnect) {
+            throw new Error("Peasant, Maximum number of repositories allowed in FREE tier is over. Upgrade to PRO tier for Unlimited repos.")
+        }
 
         const webhook = await createWebhook(owner, repo)
 
@@ -60,25 +63,26 @@ export const connectRepository = async (owner: string, repo: string, githubId: n
 
                 }
             })
+
+
+            // DONE- INCREMENET REPO COUNT FOR USAGE TRACKING
+            await incrementRepositoryCount(session.user.id);
+
+            //  TRIGGER REPO INDEXING FOR RAG 
+
+            try {
+                await inngest.send({
+                    name: "repository.connected",
+                    data: {
+                        owner,
+                        repo,
+                        userId: session.user.id
+                    }
+                })
+            } catch (error) {
+                console.error("Failed to trigger repository indexing", error)
+            }
         }
-
-        // TODO INCREMENET REPO COUNT FOR USAGE TRACKING
-
-        //  TRIGGER REPO INDEXING FOR RAG 
-
-        try {
-            await inngest.send({
-                name: "repository.connected",
-                data: {
-                    owner,
-                    repo,
-                    userId: session.user.id
-                }
-            })
-        } catch (error) {
-            console.error("Failed to trigger repository indexing", error)
-        }
-
         return webhook
 
 
