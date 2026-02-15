@@ -1,7 +1,6 @@
 "use client"
 import React from "react"
 import { signOut } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
 
 const Logout = ({
     children,
@@ -10,15 +9,17 @@ const Logout = ({
     children: React.ReactNode,
     className?: string
 }) => {
-    const router = useRouter()
     return (
-        <span className={className!} onClick={() => signOut({
-            fetchOptions: {
-                onSuccess: () => {
-                    router.push("/login")
+        <span className={className!} onClick={async () => {
+            await signOut({
+                fetchOptions: {
+                    onSuccess: () => {
+                        // Use hard redirect to clear all cached state
+                        window.location.href = "/login"
+                    }
                 }
-            }
-        })}> {children} </span>
+            })
+        }}> {children} </span>
     )
 }
 
