@@ -1,10 +1,11 @@
 import { pineconeIndex } from "@/lib/pincecone";
 import { embed } from "ai";
 import { google } from "@ai-sdk/google";
+import "dotenv/config";
 
 export async function generateEmbedding(text: string) {
     const { embedding } = await embed({
-        model: google.embedding("text-embedding-04"),
+        model: google.embedding("gemini-embedding-001"), // 3072 dimensions, new state of art model as of 14th Jan, 2026
         value: text
     })
     return embedding
