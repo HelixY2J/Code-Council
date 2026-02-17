@@ -54,7 +54,7 @@ export const AppSidebar = () => {
         { href: "/dashboard", label: "Dashboard", icon: GithubLogoIcon },
         { href: "/dashboard/repository", label: "Repositories", icon: BookIcon },
         { href: "/dashboard/reviews", label: "Reviews", icon: TreeViewIcon },
-        { href: "/dashboard/subscriptions", label: "Subscriptions", icon: CoinsIcon },
+        { href: "/dashboard/subscription", label: "Subscriptions", icon: CoinsIcon },
         { href: "/dashboard/settings", label: "Settings", icon: GearSixIcon },
     ]
 

@@ -46,50 +46,49 @@ const ActivityChart = () => {
                                 bottom: 5,
                             }}
                         >
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted-foreground)/0.2)" />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" strokeOpacity={0.5} />
                             <XAxis
                                 dataKey="name"
-                                stroke="hsl(var(--muted-foreground))"
+                                stroke="var(--muted-foreground)"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                             />
                             <YAxis
-                                stroke="hsl(var(--muted-foreground))"
+                                stroke="var(--muted-foreground)"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                                 tickFormatter={(value) => `${value}`}
                             />
                             <Tooltip
-                                cursor={{ fill: 'hsl(var(--muted)/0.4)' }}
+                                cursor={{ fill: 'var(--muted)' }}
                                 contentStyle={{
-                                    backgroundColor: 'hsl(var(--card))',
-                                    borderColor: 'hsl(var(--border))',
+                                    backgroundColor: 'var(--card)',
+                                    borderColor: 'var(--border)',
                                     borderRadius: '8px',
-                                    color: 'hsl(var(--card-foreground))'
+                                    color: 'var(--card-foreground)'
                                 }}
                             />
                             <Legend />
                             <Bar
                                 dataKey="commits"
                                 name="Commits"
-                                fill="#2563eb"
+                                fill="var(--chart-1)"
                                 radius={[4, 4, 0, 0]}
                                 maxBarSize={40}
                             />
                             <Bar
                                 dataKey="prs"
                                 name="Pull Requests"
-                                fill="#22c55e"
+                                fill="var(--chart-2)"
                                 radius={[4, 4, 0, 0]}
                                 maxBarSize={40}
-
                             />
                             <Bar
                                 dataKey="reviews"
                                 name="AI Reviews"
-                                fill="#a855f7"
+                                fill="var(--chart-3)"
                                 radius={[4, 4, 0, 0]}
                                 maxBarSize={40}
                             />

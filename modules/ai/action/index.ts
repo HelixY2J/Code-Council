@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { retrieveContext } from "../lib/rag";
 import { getPullRequestDiff } from "@/modules/github/lib/github";
 import { inngest } from "@/inngest/client";
+import { canCreateReview, incrementReviewCount } from "@/modules/payment/lib/subscription";
 
 export async function reviewPullRequest(owner: string, repo: string, prNumber: number) {
     try {
@@ -29,6 +30,10 @@ export async function reviewPullRequest(owner: string, repo: string, prNumber: n
             throw new Error("Repository not found")
         }
 
+        const canReview = await canCreateReview(repository.user.id, repository.id);
+        if (!canReview) {
+            throw new Error("Peasant, You've reached the maximum number of reviews allowed in FREE tier")
+        }
         const githubAccount = repository.user.accounts[0];
         if (!githubAccount?.accessToken) {
             throw new Error("Github account token not found for owner")
@@ -43,6 +48,8 @@ export async function reviewPullRequest(owner: string, repo: string, prNumber: n
                 userId: repository.user.id
             }
         })
+
+        await incrementReviewCount(repository.user.id, repository.id);
         return { success: true, message: "Review Queued" }
 
     } catch (error) {
