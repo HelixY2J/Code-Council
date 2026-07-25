@@ -6,6 +6,7 @@ import { Polar } from "@polar-sh/sdk";
 import { polarClient } from "@/modules/payment/config/polar";
 import { updatePolarCustomerId, updateUserTier } from "@/modules/payment/lib/subscription";
 
+
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql", // or "mysq..etc
@@ -17,19 +18,23 @@ export const auth = betterAuth({
             scope: ["repo"]
         }
     },
+
+    trustedOrigins: ["http://localhost:3002", "https://6bac-2405-201-a40c-d009-100b-4b16-a67d-986b.ngrok-free.app"],
     plugins: [
         polar({
             client: polarClient,
             createCustomerOnSignUp: true,
             use: [
                 checkout({
+                    // Configure products that can be purchased
+                    // The slug is used when calling checkout({ slug: "Pro" })
                     products: [
                         {
                             productId: "500d00ba-f6bf-43b9-8cb3-b492aa9b5842",
-                            slug: "Code-council"
+                            slug: "Pro"
                         }
                     ],
-                    successUrl: process.env.POLAR_SUCCESS_URL,
+                    successUrl: process.env.POLAR_SUCCESS_URL || "/dashboard/subscription?success=true",
                     authenticatedUsersOnly: true
                 }),
                 portal({
